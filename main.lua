@@ -50,11 +50,11 @@ local function remote_configuration()
         if initialized then
             AdMediator.start()
         else
-            print("ERROR: AdMediator can not initialized properly!")
+            print("ERROR: AdMediator could not initialized properly!")
         end
     end
 
-    AdMediator.initFromUrl("http://yourserver/admediator-init.config?"..os.time(), initCallback)    
+    AdMediator.initFromUrl("http://br.com.tapps.s3.amazonaws.com/temp/numberlink-ads-ios.json", initCallback)    
     
 end
 
@@ -176,5 +176,5 @@ initGui()
 --
 --
 -- For this sample application we use manual configuration
-local_configuration()
---remote_configuration()
+-- local_configuration()
+remote_configuration()

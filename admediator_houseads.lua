@@ -16,6 +16,7 @@ local instance = {}
 
 local houseAds = {}
 local currentHouseAdIdx = 1
+local weightTable = {}
 
 local function adRequestListener(event)
 
@@ -25,12 +26,19 @@ local function adRequestListener(event)
     end
     
     Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target})
-
-    currentHouseAdIdx = currentHouseAdIdx + 1
-    if currentHouseAdIdx > #houseAds then
-        currentHouseAdIdx = 1
-    end
-
+	
+	--> Support to weighted houseAds
+	local totalWeight = 0
+	local random = math.floor(math.random (0, 100))
+	-- print("Random number = "..random)
+	for i, p in ipairs(houseAds) do
+		totalWeight = totalWeight + p.weight
+		if totalWeight >= random then
+			-- print("Index chosen = "..i)
+		    currentHouseAdIdx = i
+			break
+		end
+	end
 end
 
 function instance:init(networkParams)
@@ -41,7 +49,6 @@ function instance:init(networkParams)
         houseAds[#houseAds+1] = p
         print(p.image,p.target)
     end
-
 end
 
 function instance:requestAd()
