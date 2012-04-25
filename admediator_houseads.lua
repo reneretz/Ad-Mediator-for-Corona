@@ -18,6 +18,20 @@ local houseAds = {}
 local currentHouseAdIdx = 1
 local weightTable = {}
 
+local function getRandomHouseAdIdx()
+	--> Support to weighted houseAds
+	local totalWeight = 0
+	local random = math.floor(math.random (0, 100))
+	for i, p in ipairs(houseAds) do
+		totalWeight = totalWeight + p.weight
+		if totalWeight >= random then
+		    return i
+		end
+	end
+	
+	return 1
+end
+
 local function adRequestListener(event)
 
     local available = true
@@ -27,18 +41,7 @@ local function adRequestListener(event)
     
     Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target})
 	
-	--> Support to weighted houseAds
-	local totalWeight = 0
-	local random = math.floor(math.random (0, 100))
-	-- print("Random number = "..random)
-	for i, p in ipairs(houseAds) do
-		totalWeight = totalWeight + p.weight
-		if totalWeight >= random then
-			-- print("Index chosen = "..i)
-		    currentHouseAdIdx = i
-			break
-		end
-	end
+	currentHouseAdIdx = getRandomHouseAdIdx()
 end
 
 function instance:init(networkParams)
@@ -49,6 +52,8 @@ function instance:init(networkParams)
         houseAds[#houseAds+1] = p
         print(p.image,p.target)
     end
+
+	currentHouseAdIdx = getRandomHouseAdIdx()
 end
 
 function instance:requestAd()
