@@ -88,17 +88,16 @@ local function webPopupListener( event )
         
         local parsedUrl = urlmodule.parse(event.url)
         local params = parse_query_string(parsedUrl.query)            
-        local link = decodeUrlEncodedString(params.u)
                     
         if parsedUrl.path == "/click" then
-            
+	        local link = decodeUrlEncodedString(params.u)
             if prevClickUrl ~= link then
                 network.request(link,"GET")
                 prevClickUrl = link
             end
             
         elseif parsedUrl.path == "/open" then
-
+	        local link = decodeUrlEncodedString(params.u)
             if prevOpenUrl ~= link then
             
                 timer.performWithDelay(10,function()                
