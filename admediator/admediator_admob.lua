@@ -98,12 +98,10 @@ local function webPopupListener( event )
         elseif parsedUrl.path == "/open" then
 	        local link = decodeUrlEncodedString(params.u)
             if prevOpenUrl ~= link then
-            
                 timer.performWithDelay(10,function()                
                     system.openURL(link)
                     native.cancelWebPopup()
                 end)
-                
                 prevOpenUrl = link
             end
             

@@ -55,7 +55,7 @@ local function remote_configuration()
         end
     end
 
-    AdMediator.initFromUrl("http://br.com.tapps.s3.amazonaws.com/temp/numberlink-ads-ios.json", initCallback)    
+    AdMediator.initFromUrl("http://br.com.tapps.ads.s3.amazonaws.com/json/tappyescape-admediator-ads-ios.json", initCallback)    
     
 end
 
