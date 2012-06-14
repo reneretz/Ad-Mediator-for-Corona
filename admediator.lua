@@ -13,6 +13,7 @@
 ------------------------------------------------------------
 
 local json = require("json")
+tpAdMediatorLibpath = tpAdMediatorLibpath or ""
 
 AdMediator = {
     clientIPAddress = "",
@@ -497,7 +498,7 @@ function AdMediator.addNetwork(params)
         return
     end
     
-    local networkObject = require(params.name)
+    local networkObject = require(tpAdMediatorLibpath..params.name)
     networks[#networks+1] = networkObject
     networkObject.priority = params.backfillpriority
     networkObject.weight = params.weight
