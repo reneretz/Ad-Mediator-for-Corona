@@ -32,18 +32,6 @@ local function getRandomHouseAdIdx()
 	return 1
 end
 
-local function adRequestListener(event)
-
-    local available = true
-    if event.isError then
-        available = false
-    end
-    
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=available,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target})
-	
-	currentHouseAdIdx = getRandomHouseAdIdx()
-end
-
 function instance:init(networkParams)
 
     print("houseads init")
@@ -58,7 +46,12 @@ end
 
 function instance:requestAd()
     
-    network.request(houseAds[currentHouseAdIdx].image,"GET",adRequestListener)
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=true,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target})
+
+    currentHouseAdIdx = currentHouseAdIdx + 1
+    if currentHouseAdIdx > #houseAds then
+        currentHouseAdIdx = 1
+    end
     
 end
 
