@@ -79,16 +79,20 @@ local function parse_query_string(query)
 end
 
 local function webPopupListener( event )            
+	print("webPopupListener")
         
     if string.find(event.url, "file://",1,true) then        
+		print("webPopupListener:file")
         return true
         
     elseif string.find(event.url, "gmsg://",1,true) then
+		print("webPopupListener:gmsg")
         
         local parsedUrl = urlmodule.parse(event.url)
         local params = parse_query_string(parsedUrl.query)            
                     
         if parsedUrl.path == "/click" then
+			print("webPopupListener:gmsg:link")			
 	        local link = decodeUrlEncodedString(params.u)
             if prevClickUrl ~= link then
                 network.request(link,"GET")
@@ -96,6 +100,7 @@ local function webPopupListener( event )
             end
             
         elseif parsedUrl.path == "/open" then
+			print("webPopupListener:gmsg:open")			
 	        local link = decodeUrlEncodedString(params.u)
             if prevOpenUrl ~= link then
                 timer.performWithDelay(10,function()                
@@ -103,43 +108,53 @@ local function webPopupListener( event )
                     native.cancelWebPopup()
                 end)
                 prevOpenUrl = link
+			else
+				prevOpenUrl = nil
             end
-            
         end            
         
         return true
         
     elseif string.find(event.url, "http://",1,true) or string.find(event.url, "https://",1,true) or string.find(event.url, "tel:",1,true) or string.find(event.url, "mailto:",1,true) then
+		print("webPopupListener:http")			
     
         local parsedUrl = urlmodule.parse(event.url)
         if parsedUrl.host == "googleads.g.doubleclick.net" or parsedUrl.host == "www.googleadservices.com" then
+			print("webPopupListener:http:googleads")			
             return true
         end
-    
-        timer.performWithDelay(10,function()
-           system.openURL(event.url)
-            native.cancelWebPopup()
-        end)
+
+        if prevOpenUrl ~= event.url then    
+	        timer.performWithDelay(10,function()
+	           system.openURL(event.url)
+	            native.cancelWebPopup()
+	        end)
+            prevOpenUrl = event.url
+		else
+			prevOpenUrl = nil
+		end
         return true
     else
     
         print("unknown protocol scheme", event.url)
         return true
-    
     end
 end    
 
 
 local function adRequestListener(event)
+	print("adRequestListener")	
 
     local available = true
     local htmlContent = ""
 
     if event.isError or not string.find(event.response, "<html>", 1, true) then
+		print("adRequestListener:error")		
         available = false
     end
     
     if available then
+		print("adRequestListener:available")		
     
         -- disable current viewport meta tag if any
         htmlContent = string.gsub(event.response,'<meta name="viewport','<meta name="viewport_disabled')
@@ -174,7 +189,8 @@ function instance:customWebPopupListener()
 end
 
 function instance:requestAd()
-    
+	print("instance:requestAd")
+	
     prevClickUrl = nil
     prevOpenUrl = nil
     

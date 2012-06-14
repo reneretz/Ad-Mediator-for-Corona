@@ -12,6 +12,8 @@
 ------------------------------------------------------------
 ------------------------------------------------------------
 
+io.output():setvbuf("no")
+
 local widget = require("widget")
 tpAdMediatorLibpath = "admediator."
 require(tpAdMediatorLibpath.."admediator")
