@@ -370,7 +370,7 @@ function AdMediator.initFromUrl(initUrl, initCallbackFunction)
 
     local function initRequestListener(event)
     
-        if event.isError then
+        if event.isError or event.response == nil then
             initCallbackFunction(false)
             return
         end
