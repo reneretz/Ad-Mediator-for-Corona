@@ -46,7 +46,7 @@ end
 
 function instance:requestAd()
     
-    Runtime:dispatchEvent({name="adMediator_adResponse",available=true,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target})
+    Runtime:dispatchEvent({name="adMediator_adResponse",available=true,imageUrl=houseAds[currentHouseAdIdx].image,adUrl=houseAds[currentHouseAdIdx].target,,htmlContent=houseAds[currentHouseAdIdx].htmlContent}})
 
     currentHouseAdIdx = currentHouseAdIdx + 1
     if currentHouseAdIdx > #houseAds then
