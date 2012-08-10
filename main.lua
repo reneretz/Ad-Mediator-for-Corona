@@ -77,7 +77,6 @@ local function local_configuration()
     
     -- There are 4 parameters common for all networks; name, weight, enabled and backfillpriority
     -- name should be the file name of the ad network plugin script file without lua extension
-    -- It can be one of "admediator_inmobi", "admediator_inneractive" or "admediator_houseads"
     -- weight denotes network selection priority as fill percentage. It can be betwwen 0 and 100.
     -- The rule is; all network weight values shoud sum up to 100. A network with weight equals to zero
     -- will never be selected for ad serving. If you have 2 networks, and you give first network a weight
@@ -89,17 +88,17 @@ local function local_configuration()
     -- networkParams is an ad plugin specific configuration block. If you plan to implement your own network
     -- plugins, you should use this block to get extended parameters.
     
-    -- Below we configure inmobi, inneractive, admob and herewead networks with respective weight values.
+    -- Below we configure inmobi, inneractive, admob, tapit and herewead networks with respective weight values.
     -- A final houseads network is configured with a weight of 0 and highest priority value.
     -- That means; this network will never be selected for ad serving, but if there are no ads from
-    -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.
+    -- each of 4 providers, AdMediator will use this last plugin to fetch our house ads.  
 
     -- clientKey is you application specific token from inmobi
     -- if you want to server demo (test) ads, set test parameter to true     
     AdMediator.addNetwork(
         {
             name="admediator_inmobi",
-            weight=25,
+            weight=20,
             backfillpriority=1,
             enabled=true,
             networkParams = {
@@ -109,10 +108,11 @@ local function local_configuration()
         }
     )
     
+    -- to receive LIVE inneractive ads, set clientKey to your inneractive app key
     AdMediator.addNetwork(
         {
             name="admediator_inneractive",    
-            weight=25,
+            weight=20,
             backfillpriority=2,
             enabled=true,
             networkParams = {
@@ -125,7 +125,7 @@ local function local_configuration()
     AdMediator.addNetwork(
         {
             name="admediator_admob",
-            weight=25,
+            weight=20,
             backfillpriority=3,
             enabled=true,
             networkParams = {
@@ -136,19 +136,35 @@ local function local_configuration()
         }
     )
     
-    -- herewead network uses additional channelId and zoneId parameters.
-    -- You should get them from herewead after registiring your application.
-    AdMediator.addNetwork(
+
+    -- to receive LIVE ads, set zoneId to your tapit zoneId and disable test mode
+    -- set enableAlertAds to receive alert ads (by calling tapit:requestAlertAds())
+    -- set swapButtons=true to swap alert ads confirmation buttons.
+    local tapit = AdMediator.addNetwork(
         {
-            name="admediator_herewead",
-            weight=25,
-            backfillpriority=4,
+            name="admediator_tapit",
+            weight=20,
+            backfillpriority=5,
             enabled=true,
             networkParams = {
-                channelId="YOUR_CHANNEL_ID_FROM_HEREWEAD",
-                zoneId="0",
+                zoneId="7527",
                 test=true,
-            },            
+                enableAlertAds=false,
+                swapButtons=false,
+            },
+        }
+    )
+
+    AdMediator.addNetwork(
+        {
+            name="admediator_madvertise",
+            weight=20,
+            backfillpriority=6,
+            enabled=true,
+            networkParams = {
+                clientToken="your_client_token_from_madvertise",
+                test=true,
+            },
         }
     )
     
@@ -157,7 +173,7 @@ local function local_configuration()
         {
             name="admediator_houseads",
             weight=0,
-            backfillpriority=5,
+            backfillpriority=7,
             networkParams = {
                 {image="http://he2apps.com/okey/adsv2/chatkapi.png",target="http://bit.ly/housead_target1"},
                 {image="http://he2apps.com/okey/adsv2/komikreplikler.jpg",target="http://bit.ly/housead_target2"},
@@ -165,6 +181,30 @@ local function local_configuration()
             },            
         }
     )
+
+    -- you can use this simple plugin to send custom parameters to your own server side scripts and
+    -- show returning html content. This plugin can be used for many useful things. You can implement
+    -- new ad networks (by usign server-side apis) or use javascript driven interactive houseads, etc.
+    --[[
+    AdMediator.addNetwork(
+        {
+            name="admediator_customHtml",
+            weight=100,
+            backfillpriority=1,
+            enabled=true,
+            networkParams = {
+                requestType="GET",
+                requestUrl = "http://he2apps.com/test/customHtmlTest.php",
+                rawResponse=false,
+                requestParams={
+                    someNumber=123850,
+                    someText="a simple text message",
+                    someOtherTextParameter="whatever you send"
+                }
+            },
+        }
+    )
+    ]]--
     
     -- finally, start serving ads
     AdMediator.start()       

@@ -174,7 +174,8 @@ local function displayContentInWebPopup(x,y,width,height,contentHtml)
     fhandle:write(contentHtml)
     io.close(fhandle)
     
-    local function webPopupListener( event )            
+    local function webPopupListener( event )
+
         if string.find(event.url, "file://", 1, false) == 1 then
             return true
         else
@@ -523,6 +524,8 @@ function AdMediator.addNetwork(params)
     networkObject:init(params.networkParams)
     
     print("addNetwork:",params.name,params.weight,params.backfillpriority)
+
+    return networkObject
     
 end
 
