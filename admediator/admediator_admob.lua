@@ -75,39 +75,46 @@ local function parse_query_string(query)
 			break;
 		end
 	end
-	
 	return parsed
 end
 
-local function webPopupListener( event )            
-    if string.find(event.url, "file://",1,true) then        
+local function fixLink(link)
+    if string.find(link, "/aclk") then
+        link = string.gsub(link, "/aclk", adServerUrl.."/aclk")
+    end
+    return link
+end
+
+local function webPopupListener( event )
+
+    if string.find(event.url, "file://",1,true) then
         return true
         
     elseif string.find(event.url, "gmsg://",1,true) then
-
+        
         local parsedUrl = urlmodule.parse(event.url)
         local params = parse_query_string(parsedUrl.query)            
+        local link = decodeUrlEncodedString(params.u)
                     
         if parsedUrl.path == "/click" then
-
-	        local link = decodeUrlEncodedString(params.u)
             if prevClickUrl ~= link then
                 network.request(link,"GET")
                 prevClickUrl = link
             end
             
         elseif parsedUrl.path == "/open" then
-
-	        local link = decodeUrlEncodedString(params.u)
             if prevOpenUrl ~= link then
-                timer.performWithDelay(10,function()                
+                timer.performWithDelay(10,function()
+                    link = fixLink(link)
                     system.openURL(link)
                     native.cancelWebPopup()
                 end)
+                
                 prevOpenUrl = link
-			else
-				prevOpenUrl = nil
+            else
+                prevOpenUrl = nil
             end
+            
         end            
         
         return true
@@ -118,21 +125,19 @@ local function webPopupListener( event )
         if parsedUrl.host == "googleads.g.doubleclick.net" or parsedUrl.host == "www.googleadservices.com" then
             return true
         end
-
+    
         if prevOpenUrl ~= event.url then    
-	        timer.performWithDelay(10,function()
-	           system.openURL(event.url)
-	            native.cancelWebPopup()
-	        end)
+            timer.performWithDelay(10,function()
+               system.openURL(event.url)
+                native.cancelWebPopup()
+            end)
             prevOpenUrl = event.url
-		else
-			prevOpenUrl = nil
-		end
-		
-        return true
+        else
+            prevOpenUrl = nil
+        end
     else
     
-        -- print("unknown protocol scheme", event.url)
+        print("unknown protocol scheme", event.url)
         return true
     end
 end    
@@ -174,6 +179,7 @@ function instance:init(networkParams)
         jsVersion = "afma-sdk-a-v4.3.1"
     end
     
+    -- print("admob init:",publisherId)
 end
 
 function instance:customWebPopupListener()
@@ -181,7 +187,7 @@ function instance:customWebPopupListener()
 end
 
 function instance:requestAd()
-	
+    
     prevClickUrl = nil
     prevOpenUrl = nil
     
